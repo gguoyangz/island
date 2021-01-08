@@ -4,12 +4,11 @@ const catchError = async (ctx, next) => {
     try {
         await next()
     } catch (error) {
-        // 捕获的err不应该返回到客户端，而应该做简化处理后再返回前端
-        // 返回的应该是 status 
-        // ctx.body = '服务器有问题'
-        // message
-        // error_code 开发者自己定义 10001 20003
-        // request_url 当前请求的url
+        // 开发环境 
+        // 生产环境 不需要抛出error
+        if (global.config.environment === 'dev') {
+            throw error
+        }
 
         //已知错误，未知错误
         if (error instanceof HttpException) {
@@ -19,6 +18,13 @@ const catchError = async (ctx, next) => {
                 request: `${ctx.method} ${ctx.path}`
             }
             ctx.status = error.code
+        } else { // 未知异常
+            ctx.body = {
+                msg: 'we made a mistake',
+                error_code: 999,
+                request: `${ctx.method} ${ctx.path}`
+            }
+            ctx.status = 500
         }
     }
 }
