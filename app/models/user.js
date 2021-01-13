@@ -24,3 +24,4 @@ User.init({
     sequelize: sequelize,
     tableName: 'user' // 自定义表名
 })
+
