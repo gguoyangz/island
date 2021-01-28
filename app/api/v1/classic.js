@@ -4,7 +4,7 @@ const router = new Router()
 const {PositiveIntegerValidator} = require('../../validators/validator')
 
 const {HttpException, ParameterException} = require('../../../core/http-exception')
-router.post('/v1/:id/classic/latest', (ctx, next) => {
+router.post('/v1/:id/classic/latest', async (ctx, next) => {
     // User
     // 账号 密码 附属信息：昵称 email 手机
     // 使用sequelize连接数据库
@@ -17,7 +17,7 @@ router.post('/v1/:id/classic/latest', (ctx, next) => {
 
     
 
-    const v = new PositiveIntegerValidator().validate(ctx)
+    const v = await new PositiveIntegerValidator().validate(ctx)
     const id = v.get('path.id', parsed=false) // 获取path下的参数id parsed是否转换为字符串类型
     v.validate(ctx)
 

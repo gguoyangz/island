@@ -22,7 +22,9 @@ const sequelize = new Sequelize(dbName, user, password, { //(dbname,user,pwd, {}
     }
 }) 
 
-sequelize.sync() // 必须加才能创建模型
+sequelize.sync({ // 必须加才能创建模型
+    force: false // 每次都清空
+}) 
 
 module.exports = {
     sequelize

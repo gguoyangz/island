@@ -1,5 +1,6 @@
-const {LinValidator, Rule} = require('../../core/lin-validator') 
-
+const {LinValidator, Rule} = require('../../core/lin-validator-v2') 
+const {User} = require('../models/user')
+const {LoginType} = require('../lib/enum')
 class PositiveIntegerValidator extends LinValidator {
     constructor () {
         super() // 如果子类需要使用下面这个this，必须调用super
@@ -36,8 +37,45 @@ class RegisterValidator extends LinValidator {
             throw new Error('两个密码必须相同')
         }
     }
+    // 检测email是否重复
+    async validateEmail (vals) {
+        const email = vals.body.email
+        const user = await User.findOne({
+            where: { // 条件
+                email: email // 查询字段必须等于email
+            }
+        })
+        if (user) {
+            throw new Error('email已存在')
+        }
+    }
+
+
+}
+
+class TokenValidator extends LinValidator {
+    constructor () {
+        super()
+        this.account = [
+            new Rule('isLength', '不符合账号规则', {min:4,max:32})
+        ]
+        this.secret = [
+            new Rule('isOptional'),
+            new Rule('isLength', '不符合账号规则', {min:6,max:128})
+        ]
+    }
+    // 登录方式校验
+    validateLoginType (vals) {
+        if (!vals.body.type) {
+            throw new Error('type是必须的参数')
+        }
+        if (!LoginType.isThisType(vals.body.type)) {
+            throw new Error('type参数不合法')
+        }
+
+    }
 }
 
 module.exports = {
-    PositiveIntegerValidator, RegisterValidator
+    PositiveIntegerValidator, RegisterValidator, TokenValidator
 }
